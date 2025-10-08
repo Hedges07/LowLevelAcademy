@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     char *filepath = NULL;
 
     int dbfd = -1;
-    struct dbhdr_t *dbhdr = NULL;
+    struct dbheader_t *dbhdr = NULL;
 
     while ((c = getopt(argc,argv,"nf:")) != -1) {
         switch (c) {
