@@ -84,20 +84,32 @@ int main(int argc, char *argv[]) {
     
     if (read_employees(dbfd, dbhdr, &employees) != STATUS_SUCCESS) {
         printf("Failed to read employees\n");
-        return -1;
+        if (dbhdr) {
+            free(dbhdr);
+        }
     }
 
     if (addstring) {
         dbhdr->count++;
         
-        if(realloc(employees, dbhdr->count*(sizeof(struct employee_t))) == NULL) {
+        struct employee_t *tmp = realloc(employees, dbhdr->count * sizeof(struct employee_t));
+        if (tmp == NULL) {
             printf("Failed to realloc\n");
             return -1;
         }
-        add_employee(dbhdr, employees, addstring);
+        employees = tmp;
+
+        add_employee(dbhdr, &employees, addstring);
     }
 
     output_file(dbfd, dbhdr, employees);
-    
+    if (dbhdr) {
+        free(dbhdr);
+        dbhdr = NULL;
+    }
+    if (employees) {
+        free(employees);
+        employees = NULL;
+    }
     return 0;
 }

@@ -112,6 +112,13 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
 	}
 
 	int count = dbhdr->count;
+
+	if (count == 0) {
+		printf("No Employees\n");
+		*employeesOut = NULL;
+		return STATUS_SUCCESS;
+	}
+
 	struct employee_t *employees = calloc(count, sizeof(struct employee_t));
 	if (employees == NULL) {
 		printf("Calloc failed\n");
@@ -129,55 +136,17 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
 	return STATUS_SUCCESS;
 }
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define STATUS_SUCCESS 0
-#define STATUS_FAILURE 1
-
-struct dbheader_t {
-    int count;
-};
-
-struct employee_t {
-    char name[50];
-    char address[100];
-    int hours;
-};
-
 int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring) {
-    printf("%s\n", addstring);
+	printf("%s\n", addstring);
 
-    // Tokenize input string
-    char *name = strtok(addstring, ",");
-    char *addr = strtok(NULL, ",");
-    char *hours_str = strtok(NULL, ",");
+	char *name = strtok(addstring,",");
+	char *addr = strtok(NULL, ",");
+	char *hours = strtok(NULL, ",");
 
-    if (!name || !addr || !hours_str) {
-        return STATUS_FAILURE; // Invalid input
-    }
+	strncpy((*employees)[dbhdr->count-1].name, name, sizeof((*employees)[dbhdr->count-1].name));
+	strncpy((*employees)[dbhdr->count-1].address, addr, sizeof((*employees)[dbhdr->count-1].address));
 
-    // Increase count
-    dbhdr->count++;
+	(*employees)[dbhdr->count-1].hours = atoi(hours);
 
-    // Reallocate memory for employees array
-    struct employee_t *new_array = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
-    if (!new_array) {
-        dbhdr->count--; // Rollback count if allocation fails
-        return STATUS_FAILURE;
-    }
-    *employees = new_array;
-
-    // Add new employee at the end
-    struct employee_t *new_emp = &(*employees)[dbhdr->count - 1];
-    strncpy(new_emp->name, name, sizeof(new_emp->name) - 1);
-    new_emp->name[sizeof(new_emp->name) - 1] = '\0';
-
-    strncpy(new_emp->address, addr, sizeof(new_emp->address) - 1);
-    new_emp->address[sizeof(new_emp->address) - 1] = '\0';
-
-    new_emp->hours = atoi(hours_str);
-
-    return STATUS_SUCCESS;
+	return STATUS_SUCCESS;
 }
