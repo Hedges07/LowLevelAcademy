@@ -137,27 +137,53 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
 }
 
 int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring) {
-	printf("%s\n", addstring);
 
-	if (addstring == NULL || strcmp(addstring, " ") == 0 || addstring[0] == '\0') {
-		printf("String Error, Employee not added\n");
-		return STATUS_ERROR;
-	}
+    if (!addstring || addstring[0] == '\0') {
+        printf("String Error, Employee not added\n");
+        return STATUS_ERROR;
+    }
 
-	char *name = strtok(addstring,",");
-	char *addr = strtok(NULL, ",");
-	char *hours = strtok(NULL, ",");
+    // Trim leading whitespace
+    while (isspace(*addstring)) addstring++;
 
+    char *name = strtok(addstring, ",");
+    char *addr = strtok(NULL, ",");
+    char *hours = strtok(NULL, ",");
 
-	if (name == NULL || addr == NULL || hours == NULL) {
-		printf("String Error, Employee not added\n");
-		return STATUS_ERROR;
-	}
+    // Validate tokens
+    if (!name || !addr || !hours) {
+        printf("String Error, Employee not added\n");
+        return STATUS_ERROR;
+    }
 
-	strncpy((*employees)[dbhdr->count-1].name, name, sizeof((*employees)[dbhdr->count-1].name));
-	strncpy((*employees)[dbhdr->count-1].address, addr, sizeof((*employees)[dbhdr->count-1].address));
+    // Trim trailing/leading spaces for each field
+    while (isspace(*name)) name++;
+    while (isspace(*addr)) addr++;
+    while (isspace(*hours)) hours++;
 
-	(*employees)[dbhdr->count-1].hours = atoi(hours);
+    if (strlen(name) == 0 || strlen(addr) == 0 || strlen(hours) == 0) {
+        printf("String Error, Employee not added\n");
+        return STATUS_ERROR;
+    }
 
-	return STATUS_SUCCESS;
+    // Safe copy with null termination
+    strncpy((*employees)[dbhdr->count-1].name, name, sizeof((*employees)[dbhdr->count-1].name)-1);
+    (*employees)[dbhdr->count-1].name[sizeof((*employees)[dbhdr->count-1].name)-1] = '\0';
+
+    strncpy((*employees)[dbhdr->count-1].address, addr, sizeof((*employees)[dbhdr->count-1].address)-1);
+    (*employees)[dbhdr->count-1].address[sizeof((*employees)[dbhdr->count-1].address)-1] = '\0';
+
+    // Validate numeric field
+    for (char *p = hours; *p; p++) {
+        if (!isdigit(*p)) {
+            printf("Invalid hours, Employee not added\n");
+            return STATUS_ERROR;
+        }
+    }
+
+    (*employees)[dbhdr->count-1].hours = atoi(hours);
+
+    printf("%s,%s,%s\n", name, addr, hours);
+
+    return STATUS_SUCCESS;
 }
