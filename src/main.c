@@ -90,17 +90,27 @@ int main(int argc, char *argv[]) {
     }
 
     if (addstring) {
-        dbhdr->count++;
-        
+    dbhdr->count++; // increase count for new employee
+
+    if (employees == NULL) {
+        // first employee
+        employees = calloc(1, sizeof(struct employee_t));
+        if (employees == NULL) {
+            printf("Failed to allocate memory for employees\n");
+            return -1;
+        }
+    } else {
+        // add to existing array
         struct employee_t *tmp = realloc(employees, dbhdr->count * sizeof(struct employee_t));
         if (tmp == NULL) {
-            printf("Failed to realloc\n");
+            printf("Failed to realloc employees\n");
             return -1;
         }
         employees = tmp;
-
-        add_employee(dbhdr, &employees, addstring);
     }
+
+    add_employee(dbhdr, &employees, addstring);
+}
 
     output_file(dbfd, dbhdr, employees);
     if (dbhdr) {
