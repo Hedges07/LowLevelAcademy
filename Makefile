@@ -8,6 +8,8 @@ run: clean default
 	./$(TARGET) -f ./mynewdb.db -a "Tyler J., ,333"
 	./$(TARGET) -f ./mynewdb.db -a "Cam P.,Test,444"
 	./$(TARGET) -f ./mynewdb.db -a " "
+	./$(TARGET) -f ./mynewdb.db -a ""
+	./$(TARGET) -f ./mynewdb.db -a "dwadawdwa"
 
 default: $(TARGET)
 
