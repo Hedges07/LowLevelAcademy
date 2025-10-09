@@ -94,6 +94,17 @@ int main(int argc, char *argv[]) {
     }
 
     output_file(dbfd, dbhdr, employees);
+
+    if (employees != NULL) {
+        free(employees);
+        employees = NULL;
+    }
+
+    if (dbhdr != NULL) {
+        free(dbhdr);
+        dbhdr = NULL;
+    }
+
     
     return 0;
 }
