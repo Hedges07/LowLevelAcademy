@@ -139,6 +139,11 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
 int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring) {
 	printf("%s\n", addstring);
 
+	if (addstring == NULL || strcmp(addstring, " ") == 0 || addstring[0] == '\0') {
+		printf("String Error, Employee not added\n");
+		return STATUS_ERROR;
+	}
+
 	char *name = strtok(addstring,",");
 	char *addr = strtok(NULL, ",");
 	char *hours = strtok(NULL, ",");
